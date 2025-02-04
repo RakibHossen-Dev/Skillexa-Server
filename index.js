@@ -24,7 +24,9 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     const blogCollections = client.db("skillexaDb").collection("blogs");
+    const userCollections = client.db("skillexaDb").collection("users");
 
+    // ------------------------------------Blog Start-------------------------------------
     // blog get api
     app.get("/blogs", async (req, res) => {
       const result = await blogCollections.find().toArray();
@@ -38,6 +40,21 @@ async function run() {
       const result = await blogCollections.findOne(query);
       res.send(result);
     });
+    // ------------------------------------Blog End-------------------------------------
+
+    // --------------------------------- Users ----------------------------------------
+    // user post
+    app.post("/users", async (req, res) => {
+      const user = req.body;
+      const query = { email: user.email };
+      const existingUser = await userCollections.findOne(query);
+      if (existingUser) {
+        return res.send({ message: "user already exists", insertedId: null });
+      }
+      const result = await userCollections.insertOne(user);
+      res.send(result);
+    });
+    // --------------------------------- Users ----------------------------------------
 
     // Connect the client to the server	(optional starting in v4.7)
     // await client.connect();
